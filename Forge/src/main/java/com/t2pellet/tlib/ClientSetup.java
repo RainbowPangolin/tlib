@@ -2,8 +2,6 @@ package com.t2pellet.tlib;
 
 import com.t2pellet.tlib.client.TLibModClient;
 import com.t2pellet.tlib.client.compat.ConfigMenu;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.fml.ModLoadingContext;
 
