@@ -13,6 +13,7 @@ import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -50,7 +51,7 @@ public abstract class TLibForgeMod {
         // Common init
         onCommonSetup();
         // Client init
-        onClientSetup();
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientSetup.onClientSetup(clientMod, modid));
         // Register into deferred registers
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         ENTITIES.register(bus);
@@ -81,26 +82,4 @@ public abstract class TLibForgeMod {
             ConfigRegistrar.INSTANCE.register(modid, commonMod::config);
         }
     }
-
-    @OnlyIn(Dist.CLIENT)
-    private void onClientSetup() {
-        if (clientMod != null) {
-            ClientRegistrar.INSTANCE.registerFromClass(modid, clientMod.entityModels());
-            ClientRegistrar.INSTANCE.registerFromClass(modid, clientMod.entityRenderers());
-            ClientRegistrar.INSTANCE.registerFromClass(modid, clientMod.particleFactories());
-        }
-        // I have no idea why their modid is different in forge
-        if (Services.PLATFORM.isModLoaded("cloth_config")) {
-            System.out.println("CLOTH LOADED");
-            ConfigMenu configMenu = new ConfigMenu(modid);
-            ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
-                    () -> {
-                        System.out.println("REGISTERED CONFIG FACTORY");
-                        return new ConfigScreenHandler.ConfigScreenFactory((minecraft, screen) -> configMenu.buildConfigScreen());
-                    });
-        }
-    }
-
-
-
 }
